@@ -38,7 +38,7 @@ export async function generateMetadata({
 
   return {
     title: product.name,
-    description: `مشاهده و خرید ${product.name} از فروشگاه Lumina Vitray.`,
+    description: `مشاهده و خرید ${product.name} از فروشگاه SAYEH.`,
   };
 }
 

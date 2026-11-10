@@ -7,7 +7,7 @@ export default function AboutUsPage() {
           <img src="/logos/mark.svg" alt="" className="mx-auto mb-8 h-14 w-14" />
 
           <p className="mb-6 text-sm tracking-[0.5em] text-graphite">
-            ABOUT LUMINA
+            ABOUT SAYEH
           </p>
 
           <h1 className="text-5xl font-bold leading-tight tracking-tight md:text-8xl">

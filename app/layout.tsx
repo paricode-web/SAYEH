@@ -13,7 +13,7 @@ const katibeh = Katibeh({
 export const metadata: Metadata = {
   title: {
     default: "Lumina Vitray",
-    template: "%s | Lumina Vitray",
+    template: "%s |SAYEH",
   },
   description:
     "فروشگاه قاب ویترای دست‌ساز؛ تلالو نور و رنگ روی شیشه‌های هنری.",

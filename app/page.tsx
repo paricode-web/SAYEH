@@ -61,7 +61,7 @@ export default async function Home({ searchParams }: HomeProps) {
           />
 
           <h1 className="mb-3 text-5xl font-bold tracking-tight sm:text-6xl md:text-7xl lg:text-8xl">
-            Lumina Vitray
+           SAYEH
           </h1>
 
           <p className="mb-8 text-sm text-fog sm:text-base md:text-lg">

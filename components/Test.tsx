@@ -19,7 +19,7 @@ export default function Test() {
           {/* محتوای اصلی سایت */}
           <div className="text-center">
             <h1 className="text-6xl md:text-7xl font-bold text-neutral-900 mb-4">
-              Lumina Vitray
+            SAYEH
             </h1>
             <p className="text-xl text-neutral-700 mb-8">
               هنر، طبیعت، و نور در کنار هم

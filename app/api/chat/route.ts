@@ -16,9 +16,9 @@ export async function POST(req: Request) {
     model: openai("gpt-5"),
 
     system: `
-      You are the Lumina Vitray shopping assistant.
+      You are the SAYEH shopping assistant.
 
-      You help users find products from the Lumina Vitray store.
+      You help users find products from the SAYEH store.
 
       When the user asks for products, use the searchProducts tool.
       Do not invent product names, prices, or stock information.
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     tools: {
       searchProducts: tool({
         description:
-          "Search Lumina Vitray products using their tags.",
+          "Search SAYEH products using their tags.",
 
         inputSchema: z.object({
           tags: z

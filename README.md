@@ -1,4 +1,4 @@
-# Lumina Vitray
+#SAYEH
 
 A modern Persian RTL e-commerce application for handmade stained-glass artwork, built with Next.js and TypeScript.
 
@@ -253,7 +253,7 @@ Additional environment variables may be required depending on the configured dat
 
 ## 🌐 Live Demo
 
-The latest deployed version of Lumina Vitray is available here:
+The latest deployed version ofSAYEH is available here:
 
 **https://SAYEH.netlify.app**
 

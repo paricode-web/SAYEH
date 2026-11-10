@@ -47,7 +47,7 @@ export default function LoginPage() {
           <img src="/logos/mark.svg" alt="" className="mx-auto mb-5 h-12 w-12" />
 
           <h2 className="mb-2 text-3xl font-bold text-ink">
-            به Lumina خوش اومدید
+            به SAYEH خوش اومدید
           </h2>
 
           <p className="text-sm text-graphite">

@@ -45,7 +45,7 @@ return (
       {/* Header */}
       <div className="mb-8 text-center">
         <p className="mb-2 text-sm font-medium text-primary-ink/60">
-          Lumina Vitray
+        SAYEH
         </p>
 
         <h1 className="text-3xl font-bold text-primary-ink">

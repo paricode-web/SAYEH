@@ -5,7 +5,7 @@ export default function AboutPreview() {
     <section className="bg-ink px-6 py-20 text-paper sm:py-28" dir="rtl">
       <div className="mx-auto max-w-3xl text-center">
         <p className="mb-5 text-sm tracking-[0.5em] text-fog">
-          ABOUT LUMINA
+          ABOUT SAYEH
         </p>
 
         <h2 className="text-4xl font-bold md:text-5xl">
