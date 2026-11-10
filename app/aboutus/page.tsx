@@ -173,7 +173,7 @@ export default function AboutUsPage() {
           </p>
 
           <a href="/" className="btn btn-on-dark mt-8 px-8 py-4">
-            مشاهده محصولات
+           	ببین
           </a>
         </div>
       </section>

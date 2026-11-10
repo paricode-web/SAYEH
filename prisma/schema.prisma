@@ -130,3 +130,14 @@ model Gallery {
   imageUrl    String
   createdAt   DateTime @default(now())
 }
+model CustomOrder {
+  id          String   @id @default(cuid())
+  name        String
+  phone       String
+  description String
+  size        String?
+  budget      String?
+  imageUrl    String?
+  status      String   @default("NEW")
+  createdAt   DateTime @default(now())
+}

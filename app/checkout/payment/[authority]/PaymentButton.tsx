@@ -58,7 +58,7 @@ router.push(`/checkout/payment/success/${result.orderId}`)
     >
       {
         loading 
-        ? "در حال بررسی..."
+        ? "صبر کن..."
         : "پرداخت"
       }
     </button>

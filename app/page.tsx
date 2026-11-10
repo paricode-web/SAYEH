@@ -118,6 +118,7 @@ export default async function Home({ searchParams }: HomeProps) {
             <Link href="/chatpage" className="btn px-8 py-4">
               محصول مناسب خود را پیدا کنید
             </Link>
+            <Link href="/custom-order" className="btn px-8 py-4">طرح خودت رو بساز</Link>
           </div>
 
           <div id="gallery" className="mt-10">

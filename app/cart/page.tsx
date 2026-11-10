@@ -98,7 +98,7 @@ export default function CartPage() {
           </span>
 
           <Link href="/checkout" className="btn px-6 py-3">
-            ادامه فرآیند خرید
+           برو پرداخت
           </Link>
         </div>
       </div>

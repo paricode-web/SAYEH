@@ -33,6 +33,10 @@ html {
   --color-graphite: #6b6b6b;   /* متن ثانویه */
   --color-fog: #d6d6d6;        /* بوردر و جداکننده */
 
+  /* --- زبان حرکتی: تغییرها سریع و بدون نرمی («کات») --- */
+  --default-transition-duration: 100ms;
+  --default-transition-timing-function: linear;
+
   /* --- فقط برای خطای فرم‌ها --- */
   --color-error: #d92d20;
 
@@ -153,9 +157,9 @@ html {
 
 /* رنگ فلش‌ها و نقطه‌های Swiper هم مشکی بشن */
 :root {
-  --swiper-theme-color: #0a0a0a;
-  --swiper-navigation-color: #0a0a0a;
-  --swiper-pagination-bullet-inactive-color: #6b6b6b;
+  --swiper-theme-color: var(--color-ink);
+  --swiper-navigation-color: var(--color-ink);
+  --swiper-pagination-bullet-inactive-color: var(--color-graphite);
   --swiper-pagination-bullet-inactive-opacity: 0.4;
 }
 
@@ -201,4 +205,23 @@ html {
 
 .gc[data-pressed="1"] .gc-shape {
   transform: translate(-50%, -50%) skewX(-20deg) scale(0.75);
+}
+
+
+/* ==========================================================
+   حالت «نور خاموش»: رنگ‌ها وارونه می‌شن
+   ========================================================== */
+html[data-mode="night"] {
+  color-scheme: dark;
+  --color-ink: #fafaf9;
+  --color-paper: #0a0a0a;
+  --color-charcoal: #ededeb;
+  --color-glass: #1a1a1a;
+  --color-graphite: #a3a3a3;
+  --color-fog: #3a3a3a;
+}
+
+/* لوگوها (SVG سیاه/سفید) هم وارونه بشن */
+html[data-mode="night"] img[src*="/logos/"] {
+  filter: invert(1);
 }

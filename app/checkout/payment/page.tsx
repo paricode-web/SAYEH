@@ -58,7 +58,7 @@ export default function PaymentPage() {
 
         {/* Header */}
         <div className="mb-8 border-b-2 border-ink pb-6">
-          <p className="mb-2 text-sm font-bold text-graphite">Lumina Vitray</p>
+          <p className="mb-2 text-sm font-bold text-graphite">SAYEH</p>
 
           <h1 className="text-3xl font-bold text-ink">خلاصه سفارش</h1>
 

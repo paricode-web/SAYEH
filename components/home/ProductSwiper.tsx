@@ -83,7 +83,7 @@ export default function ProductSlider({ products }: ProductSliderProps) {
                   </span>
                 ) : (
                   <span className="whitespace-nowrap bg-glass px-2 py-1 text-[10px] text-graphite sm:text-xs">
-                    ناموجود
+                تمام شد
                   </span>
                 )}
               </div>
@@ -93,7 +93,7 @@ export default function ProductSlider({ products }: ProductSliderProps) {
                 href={`/product/${product.slug}`}
                 className="btn mt-4 w-full py-2.5 text-xs sm:text-sm"
               >
-                مشاهده محصول
+              	ببین
               </Link>
             </div>
           </SwiperSlide>

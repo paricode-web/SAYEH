@@ -36,7 +36,7 @@ export default function Slider() {
           </p>
 
           <button className="btn px-5 py-2.5 text-sm sm:px-6 sm:py-3 sm:text-base">
-            مشاهده محصولات
+          	ببین
           </button>
         </div>
 

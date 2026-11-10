@@ -48,7 +48,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </span>
         ) : (
           <span className="bg-glass px-2 py-1 text-xs text-graphite">
-            ناموجود
+          تمام شد
           </span>
         )}
       </div>

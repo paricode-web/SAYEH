@@ -69,7 +69,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               ) : (
                 <span className="inline-flex items-center gap-2 border-2 border-fog bg-glass px-3.5 py-1.5 text-xs font-bold text-graphite sm:px-4 sm:text-sm">
                   <span className="h-2 w-2 border border-graphite" />
-                  ناموجود
+                تمام شد
                 </span>
               )}
             </div>
@@ -86,10 +86,10 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
                 setIsCartOpen(true);
 
-                toast.success(`${product.name} به سبد خرید اضافه شد`);
+                toast.success(`${product.name}  رفت توی سبد`);
               }}
             >
-              افزودن به سبد خرید
+             بردارش
             </button>
           </div>
 

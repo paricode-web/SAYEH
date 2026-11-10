@@ -12,7 +12,7 @@ const katibeh = Katibeh({
 });
 export const metadata: Metadata = {
   title: {
-    default: "Lumina Vitray",
+    default: "SAYEH",
     template: "%s |SAYEH",
   },
   description:
@@ -24,7 +24,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl">
+    <html lang="fa" dir="rtl" suppressHydrationWarning>
+      <head>
+    <script
+      dangerouslySetInnerHTML={{
+        __html: `try{if(localStorage.getItem("sayeh-mode")==="night")document.documentElement.dataset.mode="night"}catch(e){}`,
+      }}
+    />
+  </head>
       <body className={`${katibeh.variable} bg-bg-base font-vazirmatn min-h-screen`} >
         <Toaster position="top-center" />
         <GlassCursor />

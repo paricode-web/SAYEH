@@ -12,6 +12,7 @@ import { useNavTheme } from "@/app/hooks/useNavTheme";
 const links = [
   { href: "/#shop", label: "فروشگاه" },
   { href: "/#gallery", label: "گالری" },
+  { href: "/custom-order", label: "سفارش طرح" },
   { href: "/orders", label: "سفارشات" },
   { href: "/aboutus", label: "درباره ما" },
   { href: "/contact", label: "تماس با ما" },

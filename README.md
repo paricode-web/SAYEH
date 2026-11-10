@@ -9,7 +9,7 @@ A modern Persian RTL e-commerce application for handmade stained-glass artwork, 
 
 ## ✨ Overview
 
-**Lumina Vitray** is a full-stack e-commerce application designed for selling handmade stained-glass artwork online.
+**SAYEH** is a full-stack e-commerce application designed for selling handmade stained-glass artwork online.
 
 The project focuses on building a realistic shopping experience with authentication, product management, cart functionality, checkout, order management, and an administrative dashboard.
 

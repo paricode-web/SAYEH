@@ -28,7 +28,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (result?.error) {
-      setError("ایمیل یا رمز عبور اشتباه است.");
+      setError("ایمیل یا رمز اشتباهه.");
     } else {
       router.push("/");
       router.refresh();
@@ -96,7 +96,7 @@ export default function LoginPage() {
             disabled={loading}
             className="btn mt-2 w-full py-3 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? "در حال بررسی..." : "ورود به حساب"}
+            {loading ? "صبر کن..." : "ورود به حساب"}
           </button>
 
           <div className="text-center text-sm text-graphite">

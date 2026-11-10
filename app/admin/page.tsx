@@ -1,13 +1,19 @@
 // app/admin/page.tsx
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import Link from "next/link";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { prisma } from "@/lib/prisma";
 import OrderManager from "@/components/Admin/OrdersManager";
 import PictureManager from "@/components/Admin/PictureManager";
-import { prisma } from "@/lib/prisma"; // اصلاح نام ایمپورت
-import { redirect } from "next/navigation";
 import ProductManager from "@/components/Admin/ProductManager";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import cloudinary from "@/lib/cloudinary";
-import Link from "next/link";
+import CustomOrderManager from "@/components/Admin/CustomOrderManager";
+import {
+  createProduct,
+  deleteItem,
+  updateProduct,
+  uploadImage,
+} from "./actions";
 
 /* ───────── Brand tokens ─────────
    Ink #0A0A0A · Paper #FAFAF9 · Glass #EDEDEB · Graphite #6B6B6B · Fog #D6D6D6
@@ -43,7 +49,14 @@ function CardLabel({ n, children }: { n: number; children: React.ReactNode }) {
   );
 }
 
-export default async function AdminPage() {
+type SearchParams = { error?: string };
+
+export default async function AdminPage({
+  searchParams,
+}: {
+  // در Next 15 پرامیس است و در 14 آبجکت؛ await روی هر دو کار می‌کند
+  searchParams?: Promise<SearchParams> | SearchParams;
+}) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -52,114 +65,28 @@ export default async function AdminPage() {
   if (session.user.role !== "ADMIN") {
     redirect("/");
   }
-  const users = await prisma.user.findMany({
-    include: {
-      orders: {
-        include: {
-          items: {
-            include: {
-              product: true,
+
+  const { error } = (await searchParams) ?? {};
+
+  const [users, products, customOrders] = await Promise.all([
+    prisma.user.findMany({
+      include: {
+        orders: {
+          include: {
+            items: {
+              include: {
+                product: true,
+              },
             },
           },
         },
       },
-    },
-  });
-
-  const products = await prisma.product.findMany();
-
-  async function uploadImage(formData: FormData) {
-    "use server";
-
-    const image = formData.get("image") as File;
-
-    if (!image || image.size === 0) {
-      throw new Error("فایلی انتخاب نشده");
-    }
-
-    const bytes = await image.arrayBuffer();
-
-    const buffer = Buffer.from(bytes);
-
-    const uploadResult = await new Promise((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream(
-          {
-            folder: "lumina-products",
-          },
-          (error, result) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(result);
-            }
-          }
-        )
-        .end(buffer);
-    });
-
-    const imageUrl = (uploadResult as any).secure_url;
-
-    const productId = formData.get("productId") as string;
-
-    await prisma.productImage.create({
-      data: {
-        url: imageUrl,
-        productId,
-      },
-    });
-  }
-
-  async function createProduct(formData: FormData) {
-    "use server";
-
-    const name = formData.get("name") as string;
-    const price = formData.get("price") as string;
-
-    // ساخت یک اسلاگ ساده بر اساس نام محصول برای اینکه ارور یکتا بودن نگیریم
-    const slug = name.toLowerCase().replace(/ /g, "-") + "-" + Date.now();
-
-    await prisma.product.create({
-      data: {
-        name: name,
-        slug: slug,
-        price: Number(price),
-        category: "دستی", // فیلدهای اجباری اسکیما رو اینجا پر می‌کنیم
-        features: "ویژگی‌های پیش‌فرض",
-        countInStock: 10,
-      },
-    });
-  }
-
-  async function updateProduct(formData: FormData) {
-    "use server";
-
-    const id = formData.get("id") as string;
-    const name = formData.get("name") as string;
-    const price = Number(formData.get("price"));
-
-    await prisma.product.update({
-      where: {
-        id,
-      },
-      data: {
-        name,
-        price,
-      },
-    });
-  }
-
-  async function deleteItem(formdata: FormData) {
-    "use server";
-    const id = formdata.get("id") as string;
-
-    await prisma.product.delete({
-      where: {
-        id,
-      },
-    });
-    redirect("/admin");
-  }
+    }),
+    prisma.product.findMany(),
+    prisma.customOrder.findMany({
+      orderBy: { createdAt: "desc" },
+    }),
+  ]);
 
   const orderCount = users.reduce((sum, u) => sum + u.orders.length, 0);
   const fa = (n: number) => n.toLocaleString("fa-IR");
@@ -201,6 +128,16 @@ export default async function AdminPage() {
           </Link>
         </header>
 
+        {/* پیام خطا (مثلاً حذف محصولی که در سفارش‌ها هست) */}
+        {error === "product-in-use" && (
+          <div
+            role="alert"
+            className="mb-10 border-2 border-[#0A0A0A] bg-[#FAFAF9] px-5 py-4 text-sm font-bold md:mb-14 md:text-base"
+          >
+            این محصول در سفارش‌ها استفاده شده و حذف نمی‌شود.
+          </div>
+        )}
+
         {/* Stats — بلوک‌های مربعی با خط جداکننده */}
         <dl className="mb-10 grid grid-cols-3 border border-[#D6D6D6] bg-[#FAFAF9] md:mb-14">
           {[
@@ -231,15 +168,14 @@ export default async function AdminPage() {
               <CardLabel n={1}>افزودن محصول</CardLabel>
 
               <form action={createProduct} className="space-y-4 p-5 md:p-8">
-                <h2 className="text-xl font-black md:text-2xl">
-                  محصول جدید
-                </h2>
+                <h2 className="text-xl font-black md:text-2xl">محصول جدید</h2>
 
                 <input
                   type="text"
                   name="name"
                   placeholder="نام محصول"
                   required
+                  minLength={2}
                   className={inputCls}
                 />
 
@@ -248,10 +184,13 @@ export default async function AdminPage() {
                   name="price"
                   placeholder="قیمت"
                   required
+                  min={0}
                   className={inputCls}
                 />
 
-                <button className={buttonCls}>ذخیره محصول</button>
+                <button type="submit" className={buttonCls}>
+                  ذخیره محصول
+                </button>
               </form>
             </section>
 
@@ -260,10 +199,7 @@ export default async function AdminPage() {
               <CardLabel n={2}>تصاویر محصول</CardLabel>
 
               <div className="p-5 md:p-8">
-                <PictureManager
-                  products={products}
-                  uploadImage={uploadImage}
-                />
+                <PictureManager products={products} uploadImage={uploadImage} />
               </div>
             </section>
           </div>
@@ -288,6 +224,15 @@ export default async function AdminPage() {
               deleteItem={deleteItem}
               updateProduct={updateProduct}
             />
+          </div>
+        </section>
+
+        {/* Custom Orders — کارت جدا، تمام‌عرض */}
+        <section className={`mt-6 lg:mt-8 ${cardCls}`}>
+          <CardLabel n={5}>سفارش‌های سفارشی</CardLabel>
+
+          <div className="p-5 md:p-8">
+            <CustomOrderManager orders={customOrders} />
           </div>
         </section>
       </div>
