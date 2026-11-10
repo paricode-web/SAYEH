@@ -1,177 +1,128 @@
+// app/admin/gallery/page.tsx
+import Link from "next/link";
 import { addGalleryImage } from "./actions";
+
+/* ───────── Brand tokens ─────────
+   Ink #0A0A0A · Paper #FAFAF9 · Glass #EDEDEB · Graphite #6B6B6B · Fog #D6D6D6 */
+
+const labelCls = "block text-sm font-bold text-[#0A0A0A]";
+
+const fieldCls =
+  "w-full border-2 border-[#D6D6D6] bg-[#FAFAF9] px-4 py-3 text-sm md:text-base " +
+  "text-[#0A0A0A] placeholder:text-[#6B6B6B] outline-none transition-colors " +
+  "focus:border-[#0A0A0A]";
+
+const fileCls =
+  "block w-full cursor-pointer border-2 border-dashed border-[#D6D6D6] bg-[#FAFAF9] " +
+  "px-4 py-4 text-sm text-[#6B6B6B] transition-colors hover:border-[#0A0A0A] " +
+  "file:ml-4 file:cursor-pointer file:border-2 file:border-[#0A0A0A] file:bg-[#0A0A0A] " +
+  "file:px-4 file:py-2 file:text-sm file:font-bold file:text-[#FAFAF9] " +
+  "file:transition-colors hover:file:bg-[#FAFAF9] hover:file:text-[#0A0A0A]";
 
 export default function GalleryAdmin() {
   return (
-    <div className="min-h-screen bg-[#f8f5ef] p-8" dir="rtl">
+    <main
+      dir="rtl"
+      className="relative min-h-screen overflow-hidden bg-[#FAFAF9] font-vazirmatn text-[#0A0A0A]"
+    >
+      {/* تایپ خیلی درشت که از لبهٔ صفحه بیرون می‌زند */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -left-6 top-6 select-none text-[22vw] font-black leading-none tracking-[0.12em] text-[#EDEDEB] md:top-0"
+        style={{ direction: "ltr" }}
+      >
+        GALLERY
+      </span>
 
-      <div className="max-w-xl mx-auto">
+      <div className="relative mx-auto max-w-2xl px-4 pb-16 pt-28 sm:px-6 md:pt-32">
+        {/* بازگشت */}
+        <Link
+          href="/admin"
+          className="mb-8 inline-block text-sm font-medium underline decoration-2 decoration-transparent underline-offset-4 transition-[text-decoration-color] hover:decoration-[#0A0A0A]"
+        >
+          ← بازگشت به پنل مدیریت
+        </Link>
 
-        <div className="
-          bg-white
-          rounded-3xl
-          shadow-xl
-          border border-gray-100
-          p-8
-        ">
+        {/* Header */}
+        <header className="mb-10 border-b-2 border-[#0A0A0A] pb-8">
+          <p className="mb-3 text-xs font-bold tracking-widest text-[#6B6B6B]">
+            گالری
+          </p>
+          <h1 className="text-4xl font-black leading-tight md:text-6xl">
+            افزودن اثر
+          </h1>
+          <p className="mt-3 text-sm text-[#6B6B6B] md:text-base">
+            یک اثر جدید به گالری سایه اضافه کنید.
+          </p>
+        </header>
 
-          <div className="mb-8 text-center">
-
-            <h1 className="
-              text-3xl
-              font-bold
-              text-gray-900
-            ">
-              افزودن تصویر گالری
-            </h1>
-
-            <p className="
-              mt-3
-              text-gray-500
-            ">
-              یک اثر جدید به نمایشگاه Lumina اضافه کنید
-            </p>
-
+        {/* Form card */}
+        <section className="border border-[#D6D6D6] bg-[#EDEDEB]">
+          <div className="flex items-center gap-3 border-b border-[#D6D6D6] bg-[#FAFAF9] px-5 py-3 text-xs text-[#6B6B6B] md:px-8">
+            <span className="font-bold text-[#0A0A0A]">۰۱</span>
+            <span
+              aria-hidden
+              className="inline-block h-3.5 w-px bg-[#0A0A0A]/40"
+              style={{ transform: "skewX(-20deg)" }}
+            />
+            اثر جدید
           </div>
-
 
           <form
             action={addGalleryImage}
             encType="multipart/form-data"
-            className="space-y-6"
+            className="space-y-6 p-5 md:p-8"
           >
-
             <div className="space-y-2">
-
-              <label className="
-                text-sm
-                font-medium
-                text-gray-700
-              ">
+              <label htmlFor="title" className={labelCls}>
                 عنوان تصویر
               </label>
-
               <input
+                id="title"
                 name="title"
                 placeholder="مثلاً: پنجره نورانی"
-                className="
-                  w-full
-                  rounded-2xl
-                  border border-gray-200
-                  bg-gray-50
-                  px-5 py-3
-                  outline-none
-                  transition
-                  focus:border-sky-400
-                  focus:bg-white
-                  focus:ring-4
-                  focus:ring-sky-100
-                "
+                className={fieldCls}
               />
-
             </div>
 
-
             <div className="space-y-2">
-
-              <label className="
-                text-sm
-                font-medium
-                text-gray-700
-              ">
+              <label htmlFor="description" className={labelCls}>
                 توضیحات
               </label>
-
               <textarea
+                id="description"
                 name="description"
-                placeholder="توضیح کوتاه درباره اثر..."
+                placeholder="توضیح کوتاه دربارهٔ اثر..."
                 rows={4}
-                className="
-                  w-full
-                  rounded-2xl
-                  border border-gray-200
-                  bg-gray-50
-                  px-5 py-3
-                  resize-none
-                  outline-none
-                  transition
-                  focus:border-sky-400
-                  focus:bg-white
-                  focus:ring-4
-                  focus:ring-sky-100
-                "
+                className={`${fieldCls} resize-none`}
               />
-
             </div>
 
-
             <div className="space-y-2">
-
-              <label className="
-                text-sm
-                font-medium
-                text-gray-700
-              ">
+              <label htmlFor="image" className={labelCls}>
                 تصویر اثر
               </label>
-
               <input
+                id="image"
                 name="image"
                 type="file"
                 accept="image/*"
-                className="
-                  block
-                  w-full
-                  cursor-pointer
-                  rounded-2xl
-                  border
-                  border-dashed
-                  border-gray-300
-                  bg-gray-50
-                  px-5
-                  py-4
-                  text-sm
-                  text-gray-500
-                  file:mr-4
-                  file:rounded-xl
-                  file:border-0
-                  file:bg-sky-100
-                  file:px-4
-                  file:py-2
-                  file:text-sky-700
-                  hover:border-sky-400
-                "
+                className={fileCls}
               />
-
+              <p className="text-xs text-[#6B6B6B]">
+                اثر را روی زمینهٔ سفید یا روشن عکس بگیرید تا با صفحه یکی شود.
+              </p>
             </div>
-
 
             <button
               type="submit"
-              className="
-                w-full
-                rounded-2xl
-                bg-sky-600
-                py-4
-                text-white
-                font-semibold
-                shadow-lg
-                shadow-sky-200
-                transition
-                hover:bg-sky-700
-                hover:-translate-y-0.5
-                active:translate-y-0
-              "
+              className="inline-flex w-full items-center justify-center border-2 border-[#0A0A0A] bg-[#0A0A0A] py-4 text-sm font-bold text-[#FAFAF9] transition-colors hover:bg-[#FAFAF9] hover:text-[#0A0A0A] md:text-base"
             >
               آپلود تصویر
             </button>
-
-
           </form>
-
-        </div>
-
+        </section>
       </div>
-
-    </div>
+    </main>
   );
 }

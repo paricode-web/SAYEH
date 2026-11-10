@@ -1,260 +1,234 @@
-
 "use client";
 
 import { ShoppingCart, Menu, X } from "lucide-react";
-import FloatingHorizontal from "../motions/FloatingHorizontal";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useCartStore } from "@/lib/cart-store";
-import Link from "next/link";
-import { useState } from "react";
+import { useNavTheme } from "@/app/hooks/useNavTheme";
+
+const links = [
+  { href: "/#shop", label: "فروشگاه" },
+  { href: "/#gallery", label: "گالری" },
+  { href: "/orders", label: "سفارشات" },
+  { href: "/aboutus", label: "درباره ما" },
+  { href: "/contact", label: "تماس با ما" },
+];
+
+/**
+ * لینک‌ها: روی هاور یک نوار مورب (هم‌زاویه با نوارهای نماد برند)
+ * از راست باز می‌شود و رنگ متن وارونه می‌شود.
+ */
+const linkBase =
+  "relative isolate px-3.5 py-2 text-sm font-bold " +
+  "before:absolute before:inset-0 before:-z-10 before:origin-right " +
+  "before:-skew-x-20 before:scale-x-0 before:transition-transform " +
+  "before:duration-150 hover:before:scale-x-100";
 
 export default function Navbar() {
   const { data: session, status } = useSession();
+  const pathname = usePathname();
   const items = useCartStore((state) => state.items);
-
-  const totalItems = items.reduce(
-    (sum, item) => sum + item.quantity,
-    0
-  );
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // زیر ناوبر بخش تیره است یا روشن؟ (data-nav-theme روی سکشن‌ها)
+  const theme = useNavTheme(36);
+  const isLight = theme === "light";
+  const suffix = isLight ? "" : "-light";
+
+  // فقط دو رنگ برند. روشن: Paper/Ink ، تیره: Ink/Paper
+  const surface = isLight
+    ? "bg-paper text-ink border-ink"
+    : "bg-ink text-paper border-paper";
+  const inverse = isLight ? "bg-ink text-paper" : "bg-paper text-ink";
+  const fx = isLight
+    ? "before:bg-ink hover:text-paper"
+    : "before:bg-paper hover:text-ink";
+  const fxActive = isLight
+    ? "before:bg-ink before:scale-x-100 text-paper"
+    : "before:bg-paper before:scale-x-100 text-ink";
+  const rowHover = isLight ? "hover:bg-ink hover:text-paper" : "hover:bg-paper hover:text-ink";
+  const rowLine = isLight ? "border-ink" : "border-paper";
+
+  // بستن منو با تغییر صفحه
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  // قفل اسکرول وقتی منوی موبایل بازه
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  const isActive = (href: string) => !href.includes("#") && pathname === href;
+
   return (
-    <div
-      className="fixed left-1/2 top-3 z-50 w-[94%] max-w-7xl -translate-x-1/2 font-vazirmatn md:top-4 md:w-[95%]"
+    <header
       dir="rtl"
+      className={`fixed inset-x-0 top-0 z-50 border-b-2 font-vazirmatn transition-colors duration-150 ${surface}`}
     >
-      <div className="rounded-2xl border border-white/10 bg-black/40 p-3 shadow-lg backdrop-blur-xl sm:p-4 sm:px-6 md:px-8">
+      <div className="flex h-16 w-full items-stretch justify-between md:h-[72px]">
 
-        {/* Main Navbar */}
-        <div className="flex items-center justify-between gap-3">
+        {/* ── لوگو: نماد + ورد‌مارک ── */}
+        <Link
+          href="/"
+          aria-label="سایه — صفحه اصلی"
+          className="flex shrink-0 items-center gap-3 px-4 sm:px-6 lg:px-8"
+        >
+          <Image
+            src={`/logos/mark${suffix}.svg`}
+            alt=""
+            width={36}
+            height={36}
+            priority
+            className="h-8 w-8 md:h-9 md:w-9"
+          />
+          <Image
+            src={`/logos/wordmark${suffix}.svg`}
+            alt="سایه"
+            width={94}
+            height={25}
+            priority
+            className="hidden h-5 w-auto sm:block"
+          />
+        </Link>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMenuOpen((prev) => !prev)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-neutral-200 transition hover:bg-white/10 md:hidden"
-            aria-label="منو"
-          >
-            {menuOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
-          </button>
-
-          {/* Desktop Menu */}
-          <div className="hidden items-center gap-4 text-sm text-neutral-200 lg:gap-6 md:flex">
+        {/* ── منوی دسکتاپ ── */}
+        <nav className="hidden flex-1 items-center justify-center gap-1 md:flex lg:gap-3">
+          {links.map((l) => (
             <Link
-              href="/#shop"
-              className="transition hover:text-primary"
+              key={l.href}
+              href={l.href}
+              aria-current={isActive(l.href) ? "page" : undefined}
+              className={`${linkBase} ${isActive(l.href) ? fxActive : fx}`}
             >
-              فروشگاه
+              {l.label}
             </Link>
+          ))}
+        </nav>
 
-            <Link
-              href="/#gallery"
-              className="transition hover:text-primary"
-            >
-              گالری
-            </Link>
-
-            <Link
-              href="/orders"
-              className="transition hover:text-primary"
-            >
-              سفارشات
-            </Link>
-
-            <Link
-              href="/aboutus"
-              className="transition hover:text-primary"
-            >
-              درباره ما
-            </Link>
-
-            <Link
-              href="/contact"
-              className="transition hover:text-primary"
-            >
-              تماس با ما
-            </Link>
-          </div>
-
-          {/* Strawberry */}
-          <div className="hidden pointer-events-none sm:block">
-            <FloatingHorizontal intensity={120}>
-              <Image
-                src="/images/strawberry.png"
-                alt="icon"
-                width={40}
-                height={40}
-                className="object-contain"
-              />
-            </FloatingHorizontal>
-          </div>
-
-          {/* Right Side */}
-          <div className="flex items-center gap-2 sm:gap-4">
-
-            {/* Cart */}
-            <Link
-              href="/cart"
-              className="relative flex h-9 w-9 items-center justify-center rounded-xl text-neutral-200 transition hover:bg-white/5 hover:text-primary sm:h-10 sm:w-10"
-              aria-label="سبد خرید"
-            >
-              <ShoppingCart className="h-5 w-5" />
-
-              {totalItems > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] text-accent-ink">
-                  {totalItems}
-                </span>
-              )}
-            </Link>
-
-            <div className="hidden h-5 w-px bg-white/15 sm:block" />
-
-            {/* Auth */}
-            {status === "loading" ? (
-              <span className="hidden text-xs text-neutral-400 sm:block">
-                در حال بررسی...
+        {/* ── سمت چپ: احراز هویت + سبد ── */}
+        <div className="flex items-stretch">
+          {status === "loading" ? (
+            <span className="hidden items-center px-5 text-xs text-graphite sm:flex">
+              ...
+            </span>
+          ) : session ? (
+            <div className="hidden items-center gap-1 px-4 sm:flex">
+              <span className="max-w-[120px] truncate px-2 text-sm">
+                {session.user?.name || "کاربر"}
               </span>
-            ) : session ? (
-              <div className="hidden items-center gap-2 sm:flex md:gap-3">
+              <Link href="/profile" className={`${linkBase} ${fx}`}>
+                پروفایل
+              </Link>
+              <button
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className={`${linkBase} ${fx}`}
+              >
+                خروج
+              </button>
+            </div>
+          ) : (
+            <div className="hidden items-center gap-1 px-4 sm:flex">
+              <Link href="/login" className={`${linkBase} ${fx}`}>
+                ورود
+              </Link>
+              <Link
+                href="/signup"
+                className={`px-5 py-2.5 text-sm font-bold ${inverse} hover:opacity-80`}
+              >
+                عضویت
+              </Link>
+            </div>
+          )}
 
-                <span className="max-w-[140px] truncate text-xs font-medium text-neutral-100 md:text-sm">
-                  سلام، {session.user?.name || "کاربر"} ✨
+          {/* سبد خرید: بلوک معکوس با لبهٔ مورب، مثل نوارهای نماد */}
+          <Link
+            href="/cart"
+            aria-label={`سبد خرید، ${totalItems} آیتم`}
+            style={{ clipPath: "polygon(0 0, 100% 0, calc(100% - 18px) 100%, 0 100%)" }}
+            className={`flex w-24 items-center justify-center gap-2 pr-3 md:w-28 ${inverse} hover:opacity-80`}
+          >
+            <ShoppingCart className="h-5 w-5" />
+            <span className="min-w-4 text-sm font-bold">
+              {totalItems.toLocaleString("fa-IR")}
+            </span>
+          </Link>
+        </div>
+
+        {/* ── دکمهٔ منوی موبایل ── */}
+        <button
+          onClick={() => setMenuOpen((prev) => !prev)}
+          className={`flex w-16 items-center justify-center border-r-2 md:hidden ${rowLine} ${rowHover}`}
+          aria-label="منو"
+          aria-expanded={menuOpen}
+        >
+          {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+      </div>
+
+      {/* ── منوی موبایل: تمام‌صفحه، تایپ درشت ── */}
+      {menuOpen && (
+        <div
+          className={`fixed inset-x-0 bottom-0 top-16 overflow-y-auto md:hidden ${surface}`}
+        >
+          <nav className="flex flex-col">
+            {links.map((l, i) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={`flex items-baseline gap-4 border-b-2 px-6 py-5 text-4xl font-bold ${rowLine} ${rowHover}`}
+              >
+                <span className="w-8 text-sm font-normal opacity-60">
+                  {(i + 1).toLocaleString("fa-IR", { minimumIntegerDigits: 2 })}
                 </span>
+                {l.label}
+              </Link>
+            ))}
+          </nav>
 
+          <div className="flex gap-3 p-6">
+            {session ? (
+              <>
                 <Link
                   href="/profile"
-                  className="text-xs text-neutral-300 transition hover:text-primary"
+                  className={`flex-1 border-2 py-3 text-center font-bold ${rowLine} ${rowHover}`}
                 >
                   پروفایل
                 </Link>
-
                 <button
-                  onClick={() =>
-                    signOut({ callbackUrl: "/" })
-                  }
-                  className="rounded-xl bg-white/10 px-3 py-1.5 text-xs text-neutral-100 transition hover:bg-white/15"
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className={`flex-1 border-2 py-3 text-center font-bold ${rowLine} ${rowHover}`}
                 >
                   خروج
                 </button>
-              </div>
+              </>
             ) : (
-              <div className="hidden items-center gap-2 sm:flex">
+              <>
                 <Link
                   href="/login"
-                  className="text-xs text-neutral-200 transition hover:text-primary sm:text-sm"
+                  className={`flex-1 border-2 py-3 text-center font-bold ${rowLine} ${rowHover}`}
                 >
-                  وارد شوید
+                  ورود
                 </Link>
-
                 <Link
                   href="/signup"
-                  className="rounded-xl bg-primary px-3 py-2 text-xs font-medium text-primary-ink shadow-md transition hover:bg-primary-light sm:px-4 sm:text-sm"
+                  className={`flex-1 py-3 text-center font-bold ${inverse}`}
                 >
                   عضویت
                 </Link>
-              </div>
+              </>
             )}
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <div className="mt-3 border-t border-white/10 pt-3 md:hidden">
-
-            <div className="flex flex-col gap-1">
-
-              <Link
-                href="/shop"
-                onClick={() => setMenuOpen(false)}
-                className="rounded-xl px-4 py-3 text-sm text-neutral-200 transition hover:bg-white/5 hover:text-primary"
-              >
-                فروشگاه
-              </Link>
-
-              <Link
-                href="/gallery"
-                onClick={() => setMenuOpen(false)}
-                className="rounded-xl px-4 py-3 text-sm text-neutral-200 transition hover:bg-white/5 hover:text-primary"
-              >
-                گالری
-              </Link>
-
-              <Link
-                href="/orders"
-                onClick={() => setMenuOpen(false)}
-                className="rounded-xl px-4 py-3 text-sm text-neutral-200 transition hover:bg-white/5 hover:text-primary"
-              >
-                سفارشات
-              </Link>
-
-              <Link
-                href="/aboutus"
-                onClick={() => setMenuOpen(false)}
-                className="rounded-xl px-4 py-3 text-sm text-neutral-200 transition hover:bg-white/5 hover:text-primary"
-              >
-                درباره ما
-              </Link>
-
-              <Link
-                href="/contact"
-                onClick={() => setMenuOpen(false)}
-                className="rounded-xl px-4 py-3 text-sm text-neutral-200 transition hover:bg-white/5 hover:text-primary"
-              >
-                تماس با ما
-              </Link>
-
-              <div className="my-2 h-px bg-white/10" />
-
-              {session ? (
-                <>
-                  <Link
-                    href="/profile"
-                    onClick={() => setMenuOpen(false)}
-                    className="rounded-xl px-4 py-3 text-sm text-neutral-200 transition hover:bg-white/5"
-                  >
-                    پروفایل
-                  </Link>
-
-                  <button
-                    onClick={() => {
-                      setMenuOpen(false);
-                      signOut({ callbackUrl: "/" });
-                    }}
-                    className="rounded-xl px-4 py-3 text-right text-sm text-red-300 transition hover:bg-white/5"
-                  >
-                    خروج
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    onClick={() => setMenuOpen(false)}
-                    className="rounded-xl px-4 py-3 text-sm text-neutral-200 transition hover:bg-white/5"
-                  >
-                    ورود
-                  </Link>
-
-                  <Link
-                    href="/signup"
-                    onClick={() => setMenuOpen(false)}
-                    className="rounded-xl bg-primary px-4 py-3 text-center text-sm font-medium text-primary-ink transition hover:bg-primary-light"
-                  >
-                    عضویت
-                  </Link>
-                </>
-              )}
-
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+      )}
+    </header>
   );
 }
-

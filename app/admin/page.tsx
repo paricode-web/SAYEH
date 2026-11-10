@@ -6,92 +6,116 @@ import { redirect } from "next/navigation";
 import ProductManager from "@/components/Admin/ProductManager";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import cloudinary from "@/lib/cloudinary"
+import cloudinary from "@/lib/cloudinary";
 import Link from "next/link";
 
+/* ───────── Brand tokens ─────────
+   Ink #0A0A0A · Paper #FAFAF9 · Glass #EDEDEB · Graphite #6B6B6B · Fog #D6D6D6
+   قوانین: گوشهٔ تیز، بدون شیشه‌ای/بلور، هاور دکمه = وارونه شدن،
+   هاور لینک = خط‌زیر ضخیم بدون تغییر رنگ. */
 
+const inputCls =
+  "w-full border-2 border-[#D6D6D6] bg-[#FAFAF9] px-4 py-3 text-sm md:text-base " +
+  "text-[#0A0A0A] placeholder:text-[#6B6B6B] outline-none transition-colors " +
+  "focus:border-[#0A0A0A]";
+
+const buttonCls =
+  "inline-flex w-full items-center justify-center border-2 border-[#0A0A0A] " +
+  "bg-[#0A0A0A] px-6 py-3 text-sm md:text-base font-bold text-[#FAFAF9] " +
+  "transition-colors hover:bg-[#FAFAF9] hover:text-[#0A0A0A]";
+
+const cardCls = "border border-[#D6D6D6] bg-[#EDEDEB]";
+
+/** نوار برچسب بالای هر کارت: شماره + اسلش اریب + عنوان کوتاه */
+function CardLabel({ n, children }: { n: number; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 border-b border-[#D6D6D6] bg-[#FAFAF9] px-5 py-3 text-xs text-[#6B6B6B] md:px-8">
+      <span className="font-bold text-[#0A0A0A]">
+        {n.toLocaleString("fa-IR", { minimumIntegerDigits: 2 })}
+      </span>
+      <span
+        aria-hidden
+        className="inline-block h-3.5 w-px bg-[#0A0A0A]/40"
+        style={{ transform: "skewX(-20deg)" }}
+      />
+      {children}
+    </div>
+  );
+}
 
 export default async function AdminPage() {
-
   const session = await getServerSession(authOptions);
 
-if (!session) {
-  redirect("/login")
-}
-if (session.user.role !== "ADMIN") {
-  redirect("/")
-}
+  if (!session) {
+    redirect("/login");
+  }
+  if (session.user.role !== "ADMIN") {
+    redirect("/");
+  }
   const users = await prisma.user.findMany({
-  include: {
-    orders: {
-      include: {
-        items: {
-          include: {      
-            product: true
-          }
-        }
-      }
-    }
-  }
-});
-
-const products=await prisma.product.findMany();
-async function uploadImage(formData: FormData) {
-  "use server";
-
-  const image = formData.get("image") as File;
-
-  if (!image || image.size === 0) {
-    throw new Error("فایلی انتخاب نشده");
-  }
-
-
-  const bytes = await image.arrayBuffer();
-
-  const buffer = Buffer.from(bytes);
-
-
-  const uploadResult = await new Promise((resolve, reject) => {
-
-    cloudinary.uploader.upload_stream(
-      {
-        folder: "lumina-products",
+    include: {
+      orders: {
+        include: {
+          items: {
+            include: {
+              product: true,
+            },
+          },
+        },
       },
-      (error, result) => {
-
-        if(error){
-          reject(error);
-        } else {
-          resolve(result);
-        }
-
-      }
-    ).end(buffer);
-
+    },
   });
 
+  const products = await prisma.product.findMany();
 
-  const imageUrl = (uploadResult as any).secure_url;
+  async function uploadImage(formData: FormData) {
+    "use server";
 
+    const image = formData.get("image") as File;
 
-  const productId = formData.get("productId") as string;
-
-
-  await prisma.productImage.create({
-    data:{
-      url:imageUrl,
-      productId
+    if (!image || image.size === 0) {
+      throw new Error("فایلی انتخاب نشده");
     }
-  });
 
-}
+    const bytes = await image.arrayBuffer();
+
+    const buffer = Buffer.from(bytes);
+
+    const uploadResult = await new Promise((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream(
+          {
+            folder: "lumina-products",
+          },
+          (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          }
+        )
+        .end(buffer);
+    });
+
+    const imageUrl = (uploadResult as any).secure_url;
+
+    const productId = formData.get("productId") as string;
+
+    await prisma.productImage.create({
+      data: {
+        url: imageUrl,
+        productId,
+      },
+    });
+  }
 
   async function createProduct(formData: FormData) {
     "use server";
-    
+
     const name = formData.get("name") as string;
     const price = formData.get("price") as string;
-    
+
     // ساخت یک اسلاگ ساده بر اساس نام محصول برای اینکه ارور یکتا بودن نگیریم
     const slug = name.toLowerCase().replace(/ /g, "-") + "-" + Date.now();
 
@@ -103,277 +127,170 @@ async function uploadImage(formData: FormData) {
         category: "دستی", // فیلدهای اجباری اسکیما رو اینجا پر می‌کنیم
         features: "ویژگی‌های پیش‌فرض",
         countInStock: 10,
-      }
+      },
     });
-
-  
-
   }
 
   async function updateProduct(formData: FormData) {
-  "use server";
+    "use server";
 
-  const id = formData.get("id") as string;
-  const name = formData.get("name") as string;
-  const price = Number(formData.get("price"));
+    const id = formData.get("id") as string;
+    const name = formData.get("name") as string;
+    const price = Number(formData.get("price"));
 
-  await prisma.product.update({
-    where: {
-      id,
-    },
-    data: {
-      name,
-      price,
-    },
-  });
-}
-async function deleteItem (formdata:FormData) {
-  "use server"
-  const id = formdata.get("id") as string;
+    await prisma.product.update({
+      where: {
+        id,
+      },
+      data: {
+        name,
+        price,
+      },
+    });
+  }
 
+  async function deleteItem(formdata: FormData) {
+    "use server";
+    const id = formdata.get("id") as string;
 
-  await prisma.product.delete({
-    where :{
-      id,
-    },
-  });redirect("/admin");
-}
+    await prisma.product.delete({
+      where: {
+        id,
+      },
+    });
+    redirect("/admin");
+  }
 
-return (
-  <main
-    dir="rtl"
-    className="min-h-screen relative overflow-hidden bg-[#eef6ff]"
-  >
-    {/* Background */}
-    <div className="absolute inset-0 -z-10">
-      <div className="absolute top-0 left-0 h-[300px] w-[300px] md:h-[500px] md:w-[500px] rounded-full bg-primary/30 blur-[100px] md:blur-[140px]" />
+  const orderCount = users.reduce((sum, u) => sum + u.orders.length, 0);
+  const fa = (n: number) => n.toLocaleString("fa-IR");
 
-      <div className="absolute bottom-0 right-0 h-[300px] w-[300px] md:h-[450px] md:w-[450px] rounded-full bg-secondary/20 blur-[90px] md:blur-[120px]" />
-
-      <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] md:h-[650px] md:w-[650px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/20 blur-[120px] md:blur-[170px]" />
-    </div>
-
-
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-8 md:py-12">
-
-
-      {/* Header */}
-      <div className="mb-8 md:mb-10">
-
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary-ink">
-          پنل مدیریت Lumina
-        </h1>
-
-        <p className="mt-2 text-sm md:text-base text-neutral-500">
-          مدیریت محصولات، تصاویر و سفارشات
-        </p>
-
-      </div>
-
-
-      {/* Top Cards */}
-      <div className="
-        grid 
-        grid-cols-1 
-        md:grid-cols-2 
-        xl:grid-cols-3 
-        gap-5 
-        md:gap-8
-        items-start
-      ">
-
-
-        {/* Create Product */}
-        <div
-          className="
-          rounded-3xl 
-          bg-white/50 
-          backdrop-blur-2xl 
-          border border-white/40 
-          shadow-xl 
-          p-5 
-          md:p-8
-          "
-        >
-          
-
-          <form action={createProduct} className="space-y-4 md:space-y-5">
-
-            <h2 className="text-xl md:text-2xl font-bold text-primary-ink">
-              افزودن محصول
-            </h2>
-
-
-            <input
-              type="text"
-              name="name"
-              placeholder="نام محصول"
-              required
-              className="
-              w-full 
-              rounded-xl 
-              border 
-              border-neutral-300 
-              bg-white/70 
-              px-4 
-              py-3
-              text-sm
-              md:text-base
-              outline-none 
-              focus:ring-4 
-              focus:ring-primary/30
-              "
-            />
-
-
-            <input
-              type="number"
-              name="price"
-              placeholder="قیمت"
-              required
-              className="
-              w-full 
-              rounded-xl 
-              border 
-              border-neutral-300 
-              bg-white/70 
-              px-4 
-              py-3
-              text-sm
-              md:text-base
-              outline-none 
-              focus:ring-4 
-              focus:ring-primary/30
-              "
-            />
-
-
-            <button
-              className="
-              w-full 
-              rounded-xl 
-              bg-primary 
-              hover:bg-primary-light 
-              text-primary-ink 
-              py-3 
-              text-sm
-              md:text-base
-              transition 
-              font-medium
-              "
-            >
-              ذخیره محصول
-            </button>
-
-
-          </form>
-
-        </div>
-
-
-
-
-
-        {/* Upload */}
-        <div
-          className="
-          rounded-3xl 
-          bg-white/50 
-          backdrop-blur-2xl 
-          border border-white/40 
-          shadow-xl 
-          p-5 
-          md:p-8
-          "
-        >
-
-          <PictureManager
-            products={products}
-            uploadImage={uploadImage}
-          />
-
-        </div>
-
-
-
-
-<Link
-  href="/admin/gallery"
-  className="
-    inline-flex
-    items-center
-    rounded-2xl
-    bg-sky-600
-    px-6
-    py-3
-    text-sm
-    font-semibold
-    text-white
-    shadow-lg
-    shadow-sky-200
-    transition-all
-    hover:-translate-y-1
-    hover:bg-sky-700
-  
-  "
->
-  مدیریت گالری
-</Link>
-        {/* Orders */}
-        <div
-          className="
-          rounded-3xl 
-          bg-white/50 
-          backdrop-blur-2xl 
-          border border-white/40 
-          shadow-xl 
-          p-5 
-          md:p-8
-          max-h-[500px]
-          md:max-h-[600px]
-          overflow-y-auto
-          "
-        >
-
-          <OrderManager users={users} />
-
-        </div>
-
-
-      </div>
-
-
-
-
-
-
-      {/* Product Manager */}
-      <div
-        className="
-        mt-8
-        md:mt-10
-        rounded-3xl 
-        bg-white/50 
-        backdrop-blur-2xl 
-        border border-white/40 
-        shadow-xl 
-        p-5 
-        md:p-8
-        "
+  return (
+    <main
+      dir="rtl"
+      className="relative min-h-screen overflow-hidden bg-[#FAFAF9] font-vazirmatn text-[#0A0A0A]"
+    >
+      {/* تایپ خیلی درشت که از لبهٔ صفحه بیرون می‌زند */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -left-6 top-6 select-none text-[22vw] font-black leading-none tracking-[0.12em] text-[#EDEDEB] md:top-0"
+        style={{ direction: "ltr" }}
       >
+        ADMIN
+      </span>
 
-        <ProductManager
-          products={products}
-          deleteItem={deleteItem}
-          updateProduct={updateProduct}
-        />
+      <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-28 sm:px-6 md:px-8 md:pt-32">
+        {/* Header */}
+        <header className="mb-10 flex flex-col gap-6 border-b-2 border-[#0A0A0A] pb-8 md:mb-14 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="mb-3 text-xs font-bold tracking-widest text-[#6B6B6B]">
+              پنل مدیریت
+            </p>
+            <h1 className="text-4xl font-black leading-tight sm:text-5xl md:text-7xl">
+              سایه
+            </h1>
+            <p className="mt-3 text-sm text-[#6B6B6B] md:text-base">
+              محصولات، تصاویر و سفارشات.
+            </p>
+          </div>
 
+          <Link
+            href="/admin/gallery"
+            className="inline-flex items-center justify-center border-2 border-[#0A0A0A] bg-[#0A0A0A] px-8 py-3 text-sm font-bold text-[#FAFAF9] transition-colors hover:bg-[#FAFAF9] hover:text-[#0A0A0A] md:self-end"
+          >
+            مدیریت گالری
+          </Link>
+        </header>
+
+        {/* Stats — بلوک‌های مربعی با خط جداکننده */}
+        <dl className="mb-10 grid grid-cols-3 border border-[#D6D6D6] bg-[#FAFAF9] md:mb-14">
+          {[
+            { label: "محصول", value: products.length },
+            { label: "سفارش", value: orderCount },
+            { label: "کاربر", value: users.length },
+          ].map((s, i) => (
+            <div
+              key={s.label}
+              className={`px-4 py-5 md:px-8 md:py-7 ${
+                i > 0 ? "border-r border-[#D6D6D6]" : ""
+              }`}
+            >
+              <dd className="text-3xl font-black md:text-5xl">{fa(s.value)}</dd>
+              <dt className="mt-1 text-xs text-[#6B6B6B] md:text-sm">
+                {s.label}
+              </dt>
+            </div>
+          ))}
+        </dl>
+
+        {/* گرید نامتقارن: ستون باریک (فرم‌ها) + ستون پهن (سفارشات) */}
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:gap-8">
+          {/* ستون راست در RTL */}
+          <div className="flex flex-col gap-6 lg:col-span-5 lg:gap-8">
+            {/* Create Product */}
+            <section className={cardCls}>
+              <CardLabel n={1}>افزودن محصول</CardLabel>
+
+              <form action={createProduct} className="space-y-4 p-5 md:p-8">
+                <h2 className="text-xl font-black md:text-2xl">
+                  محصول جدید
+                </h2>
+
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="نام محصول"
+                  required
+                  className={inputCls}
+                />
+
+                <input
+                  type="number"
+                  name="price"
+                  placeholder="قیمت"
+                  required
+                  className={inputCls}
+                />
+
+                <button className={buttonCls}>ذخیره محصول</button>
+              </form>
+            </section>
+
+            {/* Upload */}
+            <section className={cardCls}>
+              <CardLabel n={2}>تصاویر محصول</CardLabel>
+
+              <div className="p-5 md:p-8">
+                <PictureManager
+                  products={products}
+                  uploadImage={uploadImage}
+                />
+              </div>
+            </section>
+          </div>
+
+          {/* Orders */}
+          <section className={`${cardCls} lg:col-span-7`}>
+            <CardLabel n={3}>سفارشات</CardLabel>
+
+            <div className="max-h-[520px] overflow-y-auto p-5 md:max-h-[640px] md:p-8">
+              <OrderManager users={users} />
+            </div>
+          </section>
+        </div>
+
+        {/* Product Manager — تمام‌عرض */}
+        <section className={`mt-6 lg:mt-8 ${cardCls}`}>
+          <CardLabel n={4}>مدیریت محصولات</CardLabel>
+
+          <div className="p-5 md:p-8">
+            <ProductManager
+              products={products}
+              deleteItem={deleteItem}
+              updateProduct={updateProduct}
+            />
+          </div>
+        </section>
       </div>
-
-
-    </div>
-
-
-  </main>
-)
-  ;  }
+    </main>
+  );
+}

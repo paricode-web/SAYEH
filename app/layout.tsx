@@ -3,6 +3,7 @@ import "./globals.css";
 import AuthProvider from "./providers/AuthProvider";
 import type { Metadata } from "next";
 import { Toaster } from "react-hot-toast"
+import GlassCursor from "@/components/home/GlassCursor";
 const katibeh = Katibeh({
   weight: ["400"],
   subsets: ["arabic", "latin"],
@@ -26,6 +27,7 @@ export default function RootLayout({
     <html lang="fa" dir="rtl">
       <body className={`${katibeh.variable} bg-bg-base font-vazirmatn min-h-screen`} >
         <Toaster position="top-center" />
+        <GlassCursor />
         <AuthProvider>
         {children}
         </AuthProvider>

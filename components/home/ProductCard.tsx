@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Product as PrismaProduct } from "@prisma/client";
-
+import type { Product as PrismaProduct } from "@prisma/client";
 
 interface ProductCardProps {
   product: PrismaProduct & {
@@ -10,48 +9,49 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  // گرفتن اولین عکس با شرط امنیتی که اگر خالی بود کرش نکند
+  // اولین عکسی که با https شروع می‌شود، وگرنه placeholder
+  const mainImage =
+    product.images?.find((image) => image.url.startsWith("https://"))?.url ||
+    "/images/placeholder.jpg";
 
+  return (
+    <Link
+      href={`/product/${product.slug}`}
+      className="block cursor-pointer border-2 border-fog bg-paper p-4 text-right transition-colors hover:border-ink"
+    >
+      {/* بخش عکس */}
+      <div className="relative mb-4 h-70 w-full overflow-hidden border border-fog bg-glass">
+        <Image
+          src={mainImage}
+          alt={product.name}
+          fill
+          sizes="(max-width: 768px) 100vw, 33vw"
+          className="object-cover"
+        />
+      </div>
 
+      {/* بخش مشخصات */}
+      <h2 className="text-lg font-bold text-ink">{product.name}</h2>
+      <p className="my-2 line-clamp-2 text-sm text-graphite">
+        {product.features}
+      </p>
 
- console.log("CARD NAME:", product.name);
-  console.log("CARD SLUG:", product.slug);  const firstImage = product.images?.[0];
-console.log("CARD IMAGES:", product.images);
-// ۲. بررسی می‌کنیم: اگر خودش متن بود همان را استفاده کن، اگر آبجکت بود .url آن را بردار
-const mainImage =
-  product.images?.find((image) =>
-    image.url.startsWith("https://")
-  )?.url || "/images/placeholder.jpg";
- return (
-  <Link 
-    href={`/product/${product.slug}`} 
-    className="block bg-white p-4 rounded-xl shadow-sm border border-neutral-200 hover:shadow-md transition-shadow text-right cursor-pointer"
-  >
-    {/* بخش عکس */}
-    <div className="w-full h-70 relative mb-4 border border-neutral-200 rounded-lg overflow-hidden">
-      <Image 
-        src={mainImage} 
-        alt={product.name}
-        fill
-        sizes="(max-width: 768px) 100vw, 33vw"
-        className="object-cover"
-      />
-    </div>
+      {/* بخش قیمت و وضعیت */}
+      <div className="mt-4 flex items-center justify-between">
+        <span className="font-bold text-ink">
+          {product.price.toLocaleString()} تومان
+        </span>
 
-    {/* بخش مشخصات */}
-    <h2 className="text-lg font-semibold text-neutral-800">{product.name}</h2> 
-    <p className="text-neutral-500 text-sm my-2 line-clamp-2">{product.features}</p>
-    
-    {/* بخش قیمت و وضعیت */}
-    <div className="flex justify-between items-center mt-4">
-      <span className="text-primary-ink font-bold">{product.price.toLocaleString()} تومان</span>
-      
-      {product.countInStock > 0 ? (
-        <span className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded">موجود در انبار</span>
-      ) : (
-        <span className="text-xs bg-red-50 text-red-700 px-2 py-1 rounded">ناموجود</span>
-      )}
-    </div>
-  </Link>
-);
+        {product.countInStock > 0 ? (
+          <span className="border border-ink px-2 py-1 text-xs text-ink">
+            موجود در انبار
+          </span>
+        ) : (
+          <span className="bg-glass px-2 py-1 text-xs text-graphite">
+            ناموجود
+          </span>
+        )}
+      </div>
+    </Link>
+  );
 }

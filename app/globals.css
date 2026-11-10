@@ -18,77 +18,187 @@
 html {
   scroll-behavior: smooth;
 }
+
 /* ==========================================================
-   Lumina Vitray — Glass Palette
+   Sayeh — Monochrome Glass Palette
+   فقط سیاه، سفید و خاکستری. بدون رنگ اکسنت.
    ========================================================== */
 
 @theme {
-  /* --- رنگ‌های اصلی پالت --- */
-  --color-primary: #A2D2FF;
-  --color-primary-light: #BDE0FE;
-  --color-accent: #FFAFCC;
-  --color-accent-light: #FFC8DD;
-  --color-secondary: #CDB4DB;
+  /* --- پالت اصلی --- */
+  --color-ink: #0a0a0a;        /* رنگ اصلی، متن، دکمه */
+  --color-paper: #fafaf9;      /* پس‌زمینه */
+  --color-charcoal: #232323;   /* بخش‌های تیره */
+  --color-glass: #ededeb;      /* کارت‌ها و سطح‌های هاور */
+  --color-graphite: #6b6b6b;   /* متن ثانویه */
+  --color-fog: #d6d6d6;        /* بوردر و جداکننده */
 
-  /* --- متن روی رنگ‌های روشن (کنتراست کافی) --- */
-  --color-primary-ink: #042C53;
-  --color-accent-ink: #4B1528;
-  --color-secondary-ink: #2A1B3D;
+  /* --- فقط برای خطای فرم‌ها --- */
+  --color-error: #d92d20;
 
-  /* --- پس‌زمینه‌ی صنعتی تیره --- */
-  --color-bg-base: #0d0d0f;
-  --color-bg-surface: #17171a;
+  /* --- نام‌های معنایی (برای راحتی در کامپوننت‌ها) --- */
+  --color-bg-base: var(--color-paper);
+  --color-bg-surface: var(--color-glass);
+  --color-bg-dark: var(--color-ink);
+  --color-bg-dark-surface: var(--color-charcoal);
 }
 
 /* ==========================================================
-   کلاس‌های آماده‌ی گلس‌مورفیسم
-   className="glass-primary" یا "glass-accent" و ...
+   کامپوننت‌های آماده
    ========================================================== */
 
 @layer components {
+  /* --- دکمه: پیش‌فرض مشکی، هاور وارونه ---
+     بوردر ۲ پیکسلی از اول هست تا هاور باعث جابه‌جایی نشه */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.625rem 1.25rem;
+    border: 2px solid var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-weight: 700;
+    cursor: pointer;
+    transition: none; /* تغییر ناگهانی، حس «کات» */
+  }
+  .btn:hover,
+  .btn:focus-visible {
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 3px;
+  }
+
+  /* نسخهٔ روی بک‌گراند تیره */
+  .btn-on-dark {
+    border-color: var(--color-paper);
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+  .btn-on-dark:hover,
+  .btn-on-dark:focus-visible {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .btn-on-dark:focus-visible {
+    outline-color: var(--color-paper);
+  }
+
+  /* لینک: هاور با خط زیرین ضخیم، بدون تغییر رنگ */
+  .link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 6px;
+  }
+  .link:hover {
+    text-decoration-thickness: 3px;
+  }
+
+  /* --- گلس روی بک‌گراند روشن (Paper) --- */
   .glass {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: color-mix(in srgb, var(--color-ink) 4%, transparent);
+    border: 1px solid var(--color-fog);
   }
 
-  .glass-primary {
+  /* --- گلس روی بک‌گراند تیره (Ink / Charcoal) --- */
+  .glass-dark {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    background: color-mix(in srgb, var(--color-primary) 8%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-primary) 25%, transparent);
+    background: color-mix(in srgb, var(--color-paper) 6%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-paper) 18%, transparent);
   }
 
-  .glass-accent {
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    background: color-mix(in srgb, var(--color-accent) 8%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+  /* قاب مشکی ضخیم برای نمایش آثار، مثل قاب واقعی */
+  .art-frame {
+    border: 10px solid var(--color-ink);
+    background: var(--color-paper);
   }
+}
 
-  .glass-secondary {
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    background: color-mix(in srgb, var(--color-secondary) 8%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-secondary) 25%, transparent);
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
 /* ==========================================================
    نحوه‌ی استفاده:
 
-   <body className="bg-bg-base font-vazirmatn">
+   <body className="bg-bg-base text-ink font-vazirmatn">
 
-   <button className="bg-primary text-primary-ink hover:bg-primary-light rounded-lg px-5 py-2.5">
-     افزودن به سبد خرید
-   </button>
+   <button className="btn">افزودن به سبد خرید</button>
 
-   <span className="bg-accent text-accent-ink rounded-full px-3 py-1 text-sm">
-     ۲۰٪ تخفیف
-   </span>
+   // روی بخش تیره
+   <section className="bg-ink text-paper">
+     <button className="btn btn-on-dark">سفارش طرح</button>
+   </section>
 
-   <div className="glass-primary rounded-xl p-5">
-     محتوای کارت
-   </div>
+   <p className="text-graphite">متن ثانویه</p>
+
+   <div className="glass p-5">محتوای کارت</div>
+
+   <img className="art-frame" src="/art/go-fast.jpg" alt="" />
+
+   <span className="text-error text-sm">این فیلد الزامی است</span>
+
+   نکته: graphite فقط برای متن روی Paper یا Glass استفاده بشه.
+   fog فقط برای بوردر و خط جداکننده، نه متن.
    ========================================================== */
+
+/* رنگ فلش‌ها و نقطه‌های Swiper هم مشکی بشن */
+:root {
+  --swiper-theme-color: #0a0a0a;
+  --swiper-navigation-color: #0a0a0a;
+  --swiper-pagination-bullet-inactive-color: #6b6b6b;
+  --swiper-pagination-bullet-inactive-opacity: 0.4;
+}
+
+/* ==========================================================
+   کرسر برند (GlassCursor)
+   ========================================================== */
+.glass-cursor-active,
+.glass-cursor-active a,
+.glass-cursor-active button,
+.glass-cursor-active [role="button"],
+.glass-cursor-active label,
+.glass-cursor-active summary,
+.glass-cursor-active select {
+  cursor: none;
+}
+
+.gc {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  will-change: transform;
+  transition: opacity 0.2s;
+}
+
+.gc[data-hidden="1"] {
+  opacity: 0;
+}
+
+.gc-shape {
+  width: 8px;
+  height: 34px;
+  background: #fff;
+  transform: translate(-50%, -50%) skewX(-20deg);
+  transition: width 0.18s ease, transform 0.12s ease;
+}
+
+.gc[data-link="1"] .gc-shape {
+  width: 56px;
+}
+
+.gc[data-pressed="1"] .gc-shape {
+  transform: translate(-50%, -50%) skewX(-20deg) scale(0.75);
+}

@@ -1,15 +1,13 @@
-
 import Navbar from "@/components/layout/Navbar";
 import { prisma } from "@/lib/prisma";
 import Slider from "@/components/home/Slider";
 import ProductSlider from "@/components/home/ProductSwiper";
 import ProductCard from "@/components/home/ProductCard";
-import FloatingItem from "@/components/motions/FloatingItem";
 import Input from "@/components/home/Input";
 import Link from "next/link";
 import Gallery from "@/components/home/Gallery";
-import Chat from "@/components/ai/chat";
 import AboutPreview from "@/components/home/AboutPreviw";
+import Footer from "@/components/layout/Footer";
 
 type HomeProps = {
   searchParams: Promise<{
@@ -35,41 +33,38 @@ export default async function Home({ searchParams }: HomeProps) {
       createdAt: "desc",
     },
   });
-const images = await prisma.gallery.findMany({
-    orderBy:{
-      createdAt:"desc"
-    }
+
+  const images = await prisma.gallery.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
   });
+
   return (
     <main
-      className="relative min-h-screen overflow-x-hidden bg-bg-base pb-16 text-right"
+      className="relative min-h-screen overflow-x-hidden bg-bg-base pb-16 text-right text-ink"
       dir="rtl"
     >
       {/* Navbar */}
       <Navbar />
 
-      {/* Background Layer */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent" />
-
-        <div className="absolute left-1/3 top-1/3 h-[250px] w-[250px] rounded-full bg-primary/10 blur-3xl sm:h-[400px] sm:w-[400px] md:h-[500px] md:w-[500px]" />
-
-        <div className="absolute bottom-1/4 right-1/4 h-[220px] w-[220px] rounded-full bg-accent/10 blur-3xl sm:h-[350px] sm:w-[350px] md:h-[450px] md:w-[450px]" />
-
-        <div className="absolute right-[-50px] top-10 h-[220px] w-[220px] rounded-full bg-primary-light/20 blur-3xl sm:right-0 sm:h-[300px] sm:w-[300px] md:h-[400px] md:w-[400px]" />
-      </div>
-
       {/* Main Content */}
       <div className="relative z-10 mx-auto flex w-full max-w-[1500px] flex-col gap-10 px-4 pt-24 sm:gap-12 sm:px-6 sm:pt-28 lg:px-8">
 
         {/* Brand Intro */}
-        <div className="glass relative w-full overflow-hidden rounded-3xl p-5 text-center shadow-sm sm:p-8 md:p-12">
+        <div className="w-full bg-ink p-6 text-center text-paper sm:p-10 md:p-16">
 
-          <h1 className="mb-3 text-4xl font-bold tracking-wide text-white sm:text-5xl md:text-6xl lg:text-7xl">
+          <img
+            src="/logos/mark-light.svg"
+            alt=""
+            className="mx-auto mb-6 h-12 w-12 sm:h-16 sm:w-16"
+          />
+
+          <h1 className="mb-3 text-5xl font-bold tracking-tight sm:text-6xl md:text-7xl lg:text-8xl">
             Lumina Vitray
           </h1>
 
-          <p className="mb-6 text-sm text-neutral-400 sm:text-base md:text-lg">
+          <p className="mb-8 text-sm text-fog sm:text-base md:text-lg">
             تلالو نور و رنگ روی شیشه‌های دست‌ساز
           </p>
 
@@ -79,50 +74,18 @@ const images = await prisma.gallery.findMany({
 
           {/* Search Results */}
           {search && (
-            <div className="mx-auto mt-2 w-full max-w-xl overflow-hidden rounded-xl shadow-lg">
+            <div className="mx-auto mt-2 w-full max-w-xl overflow-hidden text-right">
               {products.map((product) => (
                 <Link
                   key={product.id}
                   href={`/product/${product.slug}`}
-                  className="block min-h-[48px] border-b border-primary/20 bg-primary px-4 py-3 text-sm text-primary-ink transition hover:bg-primary-light sm:text-base"
+                  className="block min-h-[48px] border-b border-fog bg-paper px-4 py-3 text-sm text-ink hover:bg-glass sm:text-base"
                 >
                   {product.name}
                 </Link>
               ))}
             </div>
           )}
-
-          {/* Floating Items */}
-          <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-
-            {/* بالا چپ */}
-            <div className="absolute left-[-10px] top-6 sm:left-6 sm:top-8">
-              <FloatingItem intensity={60}>
-                <div className="h-8 w-8 rounded-full bg-primary opacity-50 blur-xl sm:h-12 sm:w-12 md:h-14 md:w-14" />
-              </FloatingItem>
-            </div>
-
-            {/* پایین راست */}
-            <div className="absolute bottom-4 right-2 sm:bottom-8 sm:right-8">
-              <FloatingItem intensity={85}>
-                <div className="h-12 w-12 rounded-full bg-accent opacity-40 blur-2xl sm:h-20 sm:w-20 md:h-24 md:w-24" />
-              </FloatingItem>
-            </div>
-
-            {/* وسط */}
-            <div className="absolute left-1/2 top-1/4 -translate-x-1/2">
-              <FloatingItem intensity={90}>
-                <div className="h-5 w-5 rounded-full bg-secondary opacity-60 blur-md sm:h-7 sm:w-7 md:h-8 md:w-8" />
-              </FloatingItem>
-            </div>
-
-            {/* پایین چپ */}
-            <div className="absolute bottom-2 left-1/4">
-              <FloatingItem intensity={15}>
-                <div className="h-16 w-16 rounded-full bg-primary-light opacity-20 blur-3xl sm:h-24 sm:w-24 md:h-32 md:w-32" />
-              </FloatingItem>
-            </div>
-          </div>
         </div>
 
         {/* Main Slider */}
@@ -132,7 +95,7 @@ const images = await prisma.gallery.findMany({
 
         {/* Featured Products */}
         <section className="w-full">
-          <h2 className="mb-5 mr-1 text-xl font-bold text-neutral-200 sm:mb-6 sm:mr-2 sm:text-2xl">
+          <h2 className="mb-5 border-b-2 border-ink pb-3 text-xl font-bold text-ink sm:mb-6 sm:text-2xl">
             محصولات ویژه
           </h2>
 
@@ -140,64 +103,31 @@ const images = await prisma.gallery.findMany({
         </section>
 
         {/* All Products */}
-        <section   id="shop"  className="w-full">
-          <h2 className="mb-5 mr-1 text-xl font-bold text-neutral-200 sm:mb-6 sm:mr-2 sm:text-2xl">
+        <section id="shop" className="w-full">
+          <h2 className="mb-5 border-b-2 border-ink pb-3 text-xl font-bold text-ink sm:mb-6 sm:text-2xl">
             همه محصولات فروشگاه
           </h2>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-7 xl:grid-cols-4">
             {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-              />
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
-          
-      
-<div className="mt-16 flex justify-center">
-  <Link
-    href="/chatpage"
-    className="
-      group
-      relative
-      inline-flex
-      items-center
-      justify-center
-      rounded-full
-      border
-      border-white/60
-      bg-white/40
-      px-8
-      py-4
-      font-medium
-      text-gray-700
-      shadow-lg
-      shadow-sky-200/40
-      backdrop-blur-xl
-      transition-all
-      duration-500
-      hover:-translate-y-1
-      hover:shadow-xl
-      hover:shadow-sky-300/40
-    "
-  >
-    <span className="relative z-10">
-      محصول مناسب خود را پیدا کنید
-    </span>
-  </Link>
-</div>   
-<div 
-  id="gallery"
-  className="mt-10"
->
-  <Gallery images={images}/>
-</div>
+
+          <div className="mt-16 flex justify-center">
+            <Link href="/chatpage" className="btn px-8 py-4">
+              محصول مناسب خود را پیدا کنید
+            </Link>
+          </div>
+
+          <div id="gallery" className="mt-10">
+            <Gallery images={images} />
+          </div>
         </section>
 
-     <AboutPreview />
+        <AboutPreview />
+        <Footer />
       </div>
     </main>
   );
 }
-

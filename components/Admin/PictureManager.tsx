@@ -1,119 +1,35 @@
-import { Product } from "@prisma/client"
-
+import type { Product } from "@prisma/client";
 
 type Props = {
   uploadImage: (formData: FormData) => Promise<void>;
   products: Product[];
 };
 
+const field =
+  "w-full border-2 border-fog bg-paper p-3 text-sm text-ink focus:border-ink focus:outline-2 focus:outline-offset-2 focus:outline-ink";
 
-export default function PictureManager({
-  uploadImage,
-  products
-}: Props) {
-
+export default function PictureManager({ uploadImage, products }: Props) {
   return (
-    <section
-      className="
-      w-full
-      p-4
-      sm:p-6
-      rounded-3xl
-      bg-white/70
-      backdrop-blur-xl
-      border
-      border-white/40
-      "
-    >
-
-      <h2
-        className="
-        text-2xl
-        sm:text-3xl
-        font-bold
-        text-slate-800
-        mb-6
-        "
-      >
+    <section className="w-full border-2 border-fog bg-paper p-4 sm:p-6">
+      <h2 className="mb-6 text-2xl font-bold text-ink sm:text-3xl">
         آپلود عکس
       </h2>
 
+      <form action={uploadImage} className="flex flex-col gap-4">
+        <input type="file" name="image" accept="image/*" className={field} />
 
-      <form
-        action={uploadImage}
-        className="
-        flex
-        flex-col
-        gap-4
-        "
-      >
-
-
-        <input
-          type="file"
-          name="image"
-          accept="image/*"
-          className="
-          w-full
-          rounded-xl
-          border
-          border-slate-300
-          p-3
-          bg-white
-          text-sm
-          "
-        />
-
-
-
-        <select
-          name="productId"
-          className="
-          w-full
-          rounded-xl
-          border
-          border-slate-300
-          p-3
-          bg-white
-          text-sm
-          "
-        >
-
+        <select name="productId" className={field}>
           {products.map((product) => (
-
-            <option
-              key={product.id}
-              value={product.id}
-            >
+            <option key={product.id} value={product.id}>
               {product.name}
             </option>
-
           ))}
-
         </select>
 
-
-
-        <button
-          type="submit"
-          className="
-          w-full
-          rounded-xl
-          bg-sky-600
-          hover:bg-sky-700
-          transition
-          text-white
-          py-3
-          font-semibold
-          "
-        >
+        <button type="submit" className="btn w-full py-3">
           آپلود
         </button>
-
-
       </form>
-
-
     </section>
   );
 }

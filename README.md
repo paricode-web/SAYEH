@@ -2,8 +2,8 @@
 
 A modern Persian RTL e-commerce application for handmade stained-glass artwork, built with Next.js and TypeScript.
 
-🔗 **Live Demo:** https://lumina-vitray.netlify.app
-💻 **Source Code:** https://github.com/paricode-web/lumina-vitray
+🔗 **Live Demo:** https://SAYEH.netlify.app
+💻 **Source Code:** https://github.com/paricode-web/SAYEH
 
 ---
 
@@ -184,13 +184,13 @@ The application also uses a **Persian RTL layout** throughout the shopping exper
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/paricode-web/lumina-vitray.git
+git clone https://github.com/paricode-web/SAYEH.git
 ```
 
 ### 2. Move into the project directory
 
 ```bash
-cd lumina-vitray
+cd SAYEH
 ```
 
 ### 3. Install dependencies
@@ -255,7 +255,7 @@ Additional environment variables may be required depending on the configured dat
 
 The latest deployed version of Lumina Vitray is available here:
 
-**https://lumina-vitray.netlify.app**
+**https://SAYEH.netlify.app**
 
 > Note: The payment system in the live demo is simulated and does not process real payments.
 
